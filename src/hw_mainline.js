@@ -122,6 +122,9 @@ var setPinMode = function (pin, pinData, template, resp, callback) {
     if (debug) winston.debug('hw.setPinMode(' + [pin.key, pinData, template, JSON.stringify(resp)] + ');');
     if (isAI) {
         if (callback) callback(resp);
+        // A hack
+        gpioFile[pin.key] = '/sys/class/gpio/gpio' +
+        (isAI ? pin.ai.gpio : pin.gpio) + '/value';
         return (resp);
     }
     var p = "ocp:" + pin.key + "_pinmux";
@@ -132,6 +135,7 @@ var setPinMode = function (pin, pinData, template, resp, callback) {
     var pinmux = my.find_sysfsFile(p, my.is_ocp(), pin.universalName);
     gpioFile[pin.key] = '/sys/class/gpio/gpio' +
         (isAI ? pin.ai.gpio : pin.gpio) + '/value';
+    console.log("gpioFile:", gpioFile[pin.key]);
     if (pinmux) {
         var state = undefined;
         if ((pinData & 7) == 7) {
@@ -215,6 +219,8 @@ var exportGPIOControls = function (pin, direction, resp, callback) {
     if (debug) winston.debug('hw.exportGPIOControls(' + [pin.key, direction, resp] + ');');
     var n = isAI ? pin.ai.gpio : pin.gpio;
     var exists = my.file_existsSync(gpioFile[pin.key]);
+    console.log("exportGPIOControls: pin.key:", pin.key, "gpioFile[pin.key]", 
+            gpioFile[pin.key]);
 
     if (!exists) {
         if (debug) winston.debug("exporting gpio: " + n);

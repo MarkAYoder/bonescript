@@ -4,7 +4,7 @@
 var fs = require('fs');
 var child_process = require('child_process');
 var os = require('os');
-var bone = require('./boneai'); // Database of pins
+var bone = require('./bone'); // Database of pins
 var functions = require('./functions'); // functions.js defines several math/bit functions that are handy
 var package_json = require('../package.json');
 var g = require('./constants');
@@ -22,7 +22,7 @@ var rc = require('./rc');
 
 var debug = process.env.DEBUG ? true : false;
 
-console.log("DEBUG = " + debug);
+console.log("DEBUG:", debug);
 
 // Detect if we are on a Beagle
 var hw;
@@ -129,6 +129,7 @@ f.getPinMode.args = ['pin', 'callback'];
 
 f.pinMode = function (pin, direction, mux, pullup, slew, callback) {
     pin = my.getpin(pin);
+    console.log('pinMode(' + [pin.key, direction, mux, pullup, slew] + ');');
     if (debug) winston.debug('pinMode(' + [pin.key, direction, mux, pullup, slew] + ');');
     if (direction == g.INPUT_PULLUP) pullup = 'pullup';
     pullup = pullup || ((direction == g.INPUT) ? 'pulldown' : 'disabled');
@@ -203,6 +204,7 @@ f.pinMode = function (pin, direction, mux, pullup, slew, callback) {
 
     // Figure out the desired value
     var pinData = my.pin_data(slew, direction, pullup, mux);
+    console.log("pinData:", pinData);
 
     // May be required: mount -t debugfs none /sys/kernel/debug
     resp = hw.setPinMode(pin, pinData, template, resp);
@@ -227,7 +229,7 @@ f.pinMode = function (pin, direction, mux, pullup, slew, callback) {
     }
 
     // Enable GPIO and set direction
-    console.log('pinMode:  mux=', mux);
+    console.log('pinMode:  mux =', mux);
     if (mux == 7) {
         // Export the GPIO controls
         console.log('pinMode:  exportGPIO');
