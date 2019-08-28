@@ -124,7 +124,7 @@ var setPinMode = function (pin, pinData, template, resp, callback) {
         if (callback) callback(resp);
         // A hack
         gpioFile[pin.key] = '/sys/class/gpio/gpio' +
-        (isAI ? pin.ai.gpio : pin.gpio) + '/value';
+                (isAI ? pin.ai.gpio : pin.gpio) + '/value';
         return (resp);
     }
     var p = "ocp:" + pin.key + "_pinmux";
@@ -223,6 +223,7 @@ var exportGPIOControls = function (pin, direction, resp, callback) {
             gpioFile[pin.key]);
 
     if (!exists) {
+        console.log("exporting gpio: ", n);
         if (debug) winston.debug("exporting gpio: " + n);
         fs.writeFileSync("/sys/class/gpio/export", "" + n, null);
     }
